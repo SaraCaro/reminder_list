@@ -1,10 +1,5 @@
 
-if(localStorage.reminders != null) {
-    var recordatorio = JSON.parse(localStorage.getItem('recordatorio'));
-}
-else {
-    var recordatorio = [];
-}
+var recordatorio;
 
 $(document).ready(function() {
     $(document).keypress(function(e) {
@@ -12,6 +7,14 @@ $(document).ready(function() {
             $('#boton').click();
         }
     });
+
+
+    if(localStorage.recordatorio != null) {
+         recordatorio = JSON.parse(localStorage.getItem('recordatorio'));
+    }
+    else {
+         recordatorio = [];
+    }
 
 
     var bton = $('#boton');
@@ -22,32 +25,30 @@ $(document).ready(function() {
     total = 0;
 
 
-    if (localStorage.getItem('reminders') != null) {
+    if (localStorage.getItem('recordatorio') != null) {
         writeLocalStorage();
     }
 
-    function writeLocalStorage() {
-        var recordatorio = JSON.parse(localStorage.getItem('recordatorio'));
-        for (var i = 0; i < recordatorio.length; i++) {
-            div.append('<div id="eliminarTarea"><i class="fa-regular fa-circle"></i><i class="fa-solid fa-circle-minus"></i> <h2>' +recordatorio[i] + '</h2><h6>Prioridad <button id="low">Low</button><button id="normal">Normal</button><button id="high">High</button></h6></div>');
-            total++;
-            tareas();
-        }
-    }
-
-
     bton.click(function() {
-        var recordatorio = input.val();
-        div.append('<div id="eliminarTarea"><i class="fa-regular fa-circle"></i><i class="fa-solid fa-circle-minus"></i> <h2>' +recordatorio + '</h2><h6>Prioridad <button id="low">Low</button><button id="normal">Normal</button><button id="high">High</button><p> Añadido hace ' + Math.floor(Date.now() - new Date() )+'</p></h6></div>');
+        var recordatorioValor = input.val();
+        div.append('<div id="eliminarTarea"><i class="fa-regular fa-circle"></i><i class="fa-solid fa-circle-minus"></i> <h2>' + recordatorioValor + '</h2><h6>Prioridad <button id="low">Low</button><button id="normal">Normal</button><button id="high">High</button><p> Añadido hace ' + Math.floor(Date.now() - new Date() )+'</p></h6></div>');
         input.val('');
         total++;
         tareas();
+        recordatorio.push(recordatorioValor);
+        localStorage.setItem('recordatorio', JSON.stringify(recordatorio));
     }
     );    
 
     div.on('click', '.fa-circle-minus', function() {
         $(this).parent().remove();
-        total--;
+
+        var index = $(this).parent().index();
+        console.log(index);
+        recordatorio.splice(index, 1);
+        localStorage.setItem('recordatorio', JSON.stringify(recordatorio));
+
+        total = recordatorio.length;
         tareas();
     });
 
@@ -57,6 +58,7 @@ $(document).ready(function() {
         $(this).siblings("h2").toggleClass('tachado');
         completadas++;
         tareas();
+        localStorage.setItem('recordatorio', JSON.stringify(recordatorio));
     });
 
     div.on('click', '.fa-check-circle', function() {
@@ -68,29 +70,20 @@ $(document).ready(function() {
 
     
     div.on('click', '#low', function() {
-        $(this).toggleClass('low').css('background-color', 'green');
+        $(this).toggleClass('selected');
+        $(this).css('#normal, #high', 'not-selected');
     });
 
     div.on('click', '#normal', function() {
-        $(this).toggleClass('normal').css('background-color', 'blue');
+        $(this).toggleClass('selected');
+        $(this).css('#low, #high', 'not-selected');
     });
 
     div.on('click', '#high', function() {
-        $(this).toggleClass('high').css('background-color', 'red');
+        $(this).toggleClass('selected');
+        $(this).css('#normal, #low', 'not-selected');
     });
 
-
-    div.on('click', '.low', function() {
-        $(this).toggleClass('low').css('background-color', 'gray');
-    });
-
-    div.on('click', '.normal', function() {
-        $(this).toggleClass('normal').css('background-color', 'gray');
-    });
-
-    div.on('click', '.high', function() {
-        $(this).toggleClass('high').css('background-color', 'gray');
-    });
 
     function tareas() {
         $("#pendientes").html(total - completadas);
@@ -98,11 +91,23 @@ $(document).ready(function() {
     }
 
     borrado.click(function() {
-        div.empty();
+        $('.fa-check-circle').parent().remove();
         total = 0;
         completadas = 0;
         tareas();
+        
     });
+
+    function writeLocalStorage() {
+        var recordatorio = JSON.parse(localStorage.getItem('recordatorio'));
+        var contenedor = $('#container');
+        for (var i = 0; i < recordatorio.length; i++) {  
+            var newReminder = $('<div id="eliminarTarea"><i class="fa-regular fa-circle"></i><i class="fa-solid fa-circle-minus"></i> <h2>' + recordatorio[i] + '</h2><h6>Prioridad <button id="low">Low</button><button id="normal">Normal</button><button id="high">High</button><p> Añadido hace ' + Math.floor(Date.now() - new Date() )+'</p></h6></div>');
+            contenedor.append(newReminder);
+            newReminder.show();
+        }
+
+    }
 
 
 });

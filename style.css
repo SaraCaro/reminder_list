@@ -72,7 +72,15 @@ i.fa-check-circle{
     color: lightgreen;
 }
 
-button#low,#normal,#high{
+/* button#low,#normal,#high{
+    background-color: gray;
+} */
+
+.selected{
+    background-color: green;
+}
+
+.not-selected{
     background-color: gray;
 }
 
