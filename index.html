@@ -7,20 +7,38 @@
     <script src="https://code.jquery.com/jquery-3.6.1.js" integrity="sha256-3zlB5s2uwoUzrXK3BT7AX3FyvojsraNFxCc2vC/7pNI=" crossorigin="anonymous"></script>
     <script src="https://kit.fontawesome.com/54411caa33.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <title>Projecto JS</title>
 </head>
-<body>
+<body id="app">
     <header>
         <h1>Proyecto - Sara Caro</h1>
-        <input type="text" name="recordar" id="recordar" placeholder="¿Que quieres recordar?">
+        <input v-model="texto" type="text" name="recordar" id="recordar" placeholder="¿Que quieres recordar?" @keyup.enter="nuevaEntrada">
         <input type="submit" value="Añadir" id="boton">
+
+        <input v-model="campoFiltro" type="text" name="filtro" id="filtro" placeholder="Filtrar por palabra">
+
     </header>
     <hr>
-    <p id="texto-tareas"><i class="fa-solid fa-chart-column"></i> <span id="pendientes">0</span> tareas pendientes de un total de <span id="total">0</span>| <span><a href="#" id="borrar"><i class="fa-solid fa-xmark"></i> Borrar tareas completadas</a></span></p>
+    <p id="texto-tareas"><i class="fa-solid fa-chart-column"></i> <span id="pendientes">{{completadas}}</span> tareas pendientes de un total de <span id="total">{{totalTareas}}</span>| <span><a href="#" id="borrar" @click="borrarCompletadas()"><i class="fa-solid fa-xmark"></i> Borrar tareas completadas</a></span></p>
     <hr>
     <main>
         <div id="container">
+            <div class="singleReminder" v-for="recordatorio in recordatoriosFiltrados">
+                <div class="reminder-text">
+                    <i class="fa-regular " :class="[{'fa-check-circle' : recordatorio.realizada}, {'fa-circle' : !recordatorio.realizada}]" v-model="recordatorio.realizada" @click="recordatorio.realizada = !recordatorio.realizada"></i>
+                    <h2 :class="{tachado: recordatorio.realizada}">{{recordatorio.titulo}}</h2>
+                    
+                    <i class="fa-solid fa-circle-minus" @click="eliminarTarea(recordatorio)"></i>
 
+                    <h6>
+                        Prioridad 
+                        <button id="low" :class="[{selected : recordatorio.prioridad==1}, {notSelected : recordatorio.prioridad!=1}]" v-model="recordatorio.prioridad" @click="recordatorio.prioridad = 1, recordatoriosFiltrados">Low</button>
+                        <button id="normal" :class="[{selected : recordatorio.prioridad==2}, {notSelected : recordatorio.prioridad!=2}]" v-model="recordatorio.prioridad" @click="recordatorio.prioridad = 2, recordatoriosFiltrados">Normal</button>
+                        <button id="high" :class="[{selected : recordatorio.prioridad==3}, {notSelected : recordatorio.prioridad!=3}]" v-model="recordatorio.prioridad" @click="recordatorio.prioridad = 3, recordatoriosFiltrados">High</button>
+                    </h6>
+                </div>
+            </div>
         </div>
     </main>
     <footer>
