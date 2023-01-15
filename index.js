@@ -67,6 +67,21 @@ createApp({
         palabraFiltrada(){
             return this.recordatorios.filter((ent)=> ent.titulo.includes(this.campoFiltro));
         }
+    },
+    mounted(){
+        console.log("Cargando");
+        if(localStorage.getItem("recordatorios")){
+            this.recordatorios = JSON.parse(localStorage.getItem("recordatorios"));
+        }
+    },
+    watch:{
+        recordatorios:{
+            handler(){
+                console.log("Guardando");
+                localStorage.setItem("recordatorios", JSON.stringify(this.recordatorios));
+            },
+            deep: true
+        }
     }
 }).mount('#app')
 
